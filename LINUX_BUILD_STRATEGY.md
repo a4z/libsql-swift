@@ -292,6 +292,31 @@ swift run Memory
   - Would eliminate bash dependency and make error handling cleaner
   - Tradeoff: More complex Swift code vs simpler bash script
 
+### Build Configuration
+
+- [ ] **Consider adding debug build support**
+  - Currently: Always builds Rust library in release mode (`cargo build --release`)
+  - Pros of release-only:
+    - Optimized performance (important for database)
+    - Smaller binary size
+    - Matches macOS xcframework (likely release)
+  - Cons of release-only:
+    - Longer compile times (~4-5s vs ~2s for debug)
+    - No debug symbols for Rust code
+    - Harder to debug Rust-level issues
+  - Possible solutions:
+    - Match SwiftPM build configuration (debug vs release)
+    - Add environment variable: `LIBSQL_DEBUG=1 swift build`
+    - Detect build directory (.build/debug vs .build/release)
+
+### Library Linking Strategy
+
+- [ ] **Consider making static vs dynamic library configurable**
+  - Currently: Uses static library (`.a`) on both macOS and Linux
+  - Could make it switchable via environment variable for testing
+  - Note: For SwiftPM CLI/server apps, static is simpler
+  - Note: For iOS/macOS app bundles, dynamic frameworks work seamlessly
+
 ### Rebuild Detection
 
 - [ ] **Improve rebuild detection beyond Cargo.toml timestamp**
