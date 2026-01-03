@@ -270,7 +270,8 @@ swift run Memory
 - Follows SwiftPM convention: headers in `include/` subdirectory
 - `module.modulemap` references `header "include/libsql.h"`
 - Header copied from `Sources/CLibsql/libsql-c/libsql.h` to `Sources/CLibsqlLinux/include/libsql.h`
-- Library built by plugin and placed in `.build/plugins/outputs/.../liblibsql.so`
+- **Uses static library** (`liblibsql.a`) built by plugin, matching macOS behavior
+- Library placed in `.build/plugins/outputs/.../liblibsql.a` and statically linked
 
 ## Next Steps
 
@@ -308,14 +309,11 @@ swift run Memory
 
 ### Runtime Library Loading
 
-- [ ] **Fix LD_LIBRARY_PATH requirement for running executables**
-  - Current workaround: Must set `LD_LIBRARY_PATH` to run examples
-  - Example: `LD_LIBRARY_PATH=.build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin swift run Memory`
-  - Possible solutions:
-    - Add proper rpath support (attempted but $ORIGIN didn't work)
-    - Install library to system path
-    - Create wrapper scripts for examples
-    - Copy library to executable directory
+- [x] **~~Fix LD_LIBRARY_PATH requirement for running executables~~** ✅ **RESOLVED**
+  - **Solution**: Switched from dynamic library (`.so`) to static library (`.a`)
+  - Static linking matches macOS behavior (xcframework also uses static library)
+  - Executables now run directly without `LD_LIBRARY_PATH`: `swift run Memory`
+  - Trade-off: Larger executable size (~20MB) but simpler deployment
 
 ### Documentation
 

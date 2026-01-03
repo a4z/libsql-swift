@@ -17,11 +17,11 @@ struct BuildLibsqlPlugin: BuildToolPlugin {
         let libsqlCPath = context.package.directory.appending(["Sources", "CLibsql", "libsql-c"])
         let cargoToml = libsqlCPath.appending("Cargo.toml")
         let targetDir = libsqlCPath.appending(["target", "release"])
-        let builtLibrary = targetDir.appending("liblibsql.so")
+        let builtLibrary = targetDir.appending("liblibsql.a")
 
         // Output directory provided by SwiftPM
         let outputDir = context.pluginWorkDirectory
-        let outputLibrary = outputDir.appending("liblibsql.so")
+        let outputLibrary = outputDir.appending("liblibsql.a")
 
         // Get HOME directory
         let homeDir = FileManager.default.homeDirectoryForCurrentUser.path
