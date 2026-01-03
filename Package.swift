@@ -9,15 +9,36 @@ var package = Package(
     platforms: [ .iOS(.v12), .macOS(.v10_13) ],
     products: [
         .library(name: "Libsql", targets: ["Libsql"]),
-        
+
         // Examples
         .executable(name: "Query", targets: ["Query"]),
         .executable(name: "Transaction", targets: ["Transaction"]),
         .executable(name: "Batch", targets: ["Batch"]),
     ],
     targets: [
-        .target(name: "Libsql", dependencies: ["CLibsql"]),
+        .target(
+            name: "Libsql",
+            dependencies: [
+                .target(name: "CLibsql", condition: .when(platforms: [.macOS, .iOS])),
+                .target(name: "CLibsqlLinux", condition: .when(platforms: [.linux]))
+            ]
+        ),
         .binaryTarget(name: "CLibsql", path: "Sources/CLibsql/CLibsql.xcframework"),
+        .target(
+            name: "CLibsqlLinux",
+            path: "Sources/CLibsqlLinux",
+            linkerSettings: [
+                .unsafeFlags([
+                    "-L", ".build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin",
+                    "-llibsql"
+                ], .when(platforms: [.linux]))
+            ],
+            plugins: ["BuildLibsqlPlugin"]
+        ),
+        .plugin(
+            name: "BuildLibsqlPlugin",
+            capability: .buildTool()
+        ),
         .testTarget(name: "LibsqlTests", dependencies: ["Libsql"]),
        
         // Examples

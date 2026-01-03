@@ -1,4 +1,8 @@
+#if os(Linux)
+import CLibsqlLinux
+#else
 import CLibsql
+#endif
 import Foundation
 
 public enum Value {
