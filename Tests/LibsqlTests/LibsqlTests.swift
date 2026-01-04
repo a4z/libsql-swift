@@ -108,4 +108,47 @@ final class LibsqlTests: XCTestCase {
             XCTAssertEqual(try row.getData(3), Data([UInt8(i)]))
         }
     }
+
+    func testColumnCountAndNames() throws {
+        let db = try Database(":memory:")
+        let conn = try db.connect()
+
+        _ = try conn.execute("create table test (id integer, name text, value real)")
+        _ = try conn.execute("insert into test values (1, 'test', 3.14)")
+
+        let rows = try conn.query("select * from test")
+
+        XCTAssertEqual(rows.columnCount(), 3)
+        XCTAssertEqual(try rows.columnName(0), "id")
+        XCTAssertEqual(try rows.columnName(1), "name")
+        XCTAssertEqual(try rows.columnName(2), "value")
+    }
+
+    func testColumnNameOutOfRange() throws {
+        let db = try Database(":memory:")
+        let conn = try db.connect()
+
+        _ = try conn.execute("create table test (id integer)")
+        _ = try conn.execute("insert into test values (1)")
+
+        let rows = try conn.query("select * from test")
+
+        XCTAssertThrowsError(try rows.columnName(-1)) { error in
+            XCTAssert(error is LibsqlError)
+            if case LibsqlError.indexOutOfRange = error {
+            } else {
+                XCTFail("Expected indexOutOfRange error")
+            }
+        }
+
+        XCTAssertNoThrow(try rows.columnName(0))
+
+        XCTAssertThrowsError(try rows.columnName(1)) { error in
+            XCTAssert(error is LibsqlError)
+            if case LibsqlError.indexOutOfRange = error {
+            } else {
+                XCTFail("Expected indexOutOfRange error")
+            }
+        }
+    }
 }
