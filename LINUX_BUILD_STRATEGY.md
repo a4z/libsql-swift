@@ -255,6 +255,8 @@ swift run Memory
 - Location: `Sources/CLibsql/libsql-c`
 - Build script: `Sources/CLibsql/libsql-c/build.sh`
 - Header: `Sources/CLibsql/libsql-c/libsql.h`
+- We link the static archive (`liblibsql.a`) directly to avoid runtime
+  `LD_LIBRARY_PATH`/`liblibsql.so` issues during tests and executables.
 
 ## Platform Differences: Module Structure
 

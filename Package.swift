@@ -29,8 +29,8 @@ var package = Package(
             path: "Sources/CLibsqlLinux",
             linkerSettings: [
                 .unsafeFlags([
-                    "-L", ".build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin",
-                    "-llibsql"
+                    "-L", ".build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin/release",
+                    "-l:liblibsql.a"
                 ], .when(platforms: [.linux]))
             ],
             plugins: ["BuildLibsqlPlugin"]
