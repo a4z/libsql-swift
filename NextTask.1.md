@@ -82,3 +82,29 @@ Move all three folders (CLibsql, CLibsqlLinux, Libsql) into a new `Turso/` subfo
 9. **Clean up**
    - Remove old `Sources/` directories (should be empty except for .gitkeep if needed)
    - Commit changes
+
+## Summary
+
+This section documents the results of the source location refactoring work and the actual solution that fixed the VS Code IDE issues.
+
+### Outcome
+
+The directory refactoring itself **did not solve the IDE problem**, but it was the investigation process that led to finding the root cause: SourceKit's indexing build uses a separate `.build/index-build/` directory, and binary targets (XCFrameworks) don't get their static libraries automatically linked there.
+
+**Solution implemented:** Created a symlink from the index-build directory to the XCFramework's static library. See [VS_CodeIDE.md](VS_CodeIDE.md) for complete details.
+
+**VS Code autocomplete is now working** with `@testable import` and full IntelliSense support.
+
+### Completed Work
+
+✅ Moved all three modules (CLibsql, CLibsqlLinux, Libsql) from `Sources/` to `Turso/`
+✅ Updated Package.swift, .gitmodules, and BuildLibsqlPlugin with new paths
+✅ Created `build-xcframework.sh` for Apple Silicon-only builds (no Intel, no Nix)
+✅ Rebuilt XCFramework successfully (31.8MB static library)
+✅ All 9 tests passing
+✅ Git submodule properly configured at new location
+✅ Merged `issue/5-column-count-names` branch (adds Row.columnCount and Row.columnNames)
+
+### Next Steps
+
+This refactoring helped establish "my build" of the libsql-swift project. Since Turso is now focusing on the Rust implementation, I will continue maintaining this Swift-based build until my app is complete, then consider contributing Swift bindings for the Turso Rust implementation.
