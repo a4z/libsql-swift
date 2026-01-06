@@ -7,14 +7,14 @@ struct BuildLibsqlPlugin: BuildToolPlugin {
         #if os(Linux)
         return try createLinuxBuildCommands(context: context)
         #else
-        // On macOS/iOS, use the xcframework - no build needed
-        return []
+            // On macOS/iOS, use the xcframework - no build needed
+            return []
         #endif
     }
 
     #if os(Linux)
     private func createLinuxBuildCommands(context: PluginContext) throws -> [Command] {
-        let libsqlCPath = context.package.directory.appending(["Sources", "CLibsql", "libsql-c"])
+        let libsqlCPath = context.package.directory.appending(["Turso", "CLibsql", "libsql-c"])
         let cargoToml = libsqlCPath.appending("Cargo.toml")
         let outputDir = context.pluginWorkDirectory
         let cargoTargetDir = outputDir.appending("release")
