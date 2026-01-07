@@ -19,7 +19,7 @@ Let me know
 
 ## Solution
 
-Move all three folders (CLibsql, CLibsqlLinux, Libsql) into a new `Turso/` subfolder at the root level.
+Move all external folders (CLibsql, CLibsqlLinux) into a new `Turso/` subfolder at the root level.
 
 ### New Structure
 
@@ -33,8 +33,6 @@ Move all three folders (CLibsql, CLibsqlLinux, Libsql) into a new `Turso/` subfo
   /CLibsqlLinux/
     /include/
     /module.modulemap
-  /Libsql/
-    /Libsql.swift
 ```
 
 ### Execution Plan
@@ -51,7 +49,6 @@ Move all three folders (CLibsql, CLibsqlLinux, Libsql) into a new `Turso/` subfo
 
 3. **Create new directory structure**
    - Create `Turso/` directory at root
-   - Move `Sources/Libsql` → `Turso/Libsql`
    - Move `Sources/CLibsql` → `Turso/CLibsql`
    - Move `Sources/CLibsqlLinux` → `Turso/CLibsqlLinux`
 
@@ -60,7 +57,6 @@ Move all three folders (CLibsql, CLibsqlLinux, Libsql) into a new `Turso/` subfo
    - Run `git submodule sync` to update configuration
 
 5. **Update Package.swift**
-   - Update Libsql target path: `path: "Turso/Libsql"`
    - Update CLibsql binary target path: `path: "Turso/CLibsql/CLibsql.xcframework"`
    - Update CLibsqlLinux target path: `path: "Turso/CLibsqlLinux"`
 

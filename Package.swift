@@ -22,7 +22,7 @@ var package = Package(
                 .target(name: "CLibsql", condition: .when(platforms: [.macOS, .iOS])),
                 .target(name: "CLibsqlLinux", condition: .when(platforms: [.linux])),
             ],
-            path: "Turso/Libsql"
+            
         ),
         .binaryTarget(name: "CLibsql", path: "Turso/CLibsql/CLibsql.xcframework"),
         .target(
@@ -63,7 +63,7 @@ var package = Package(
             name: "Local",
             dependencies: ["Libsql"],
             path: "Examples/Local",
-            exclude: ["README.md", "local.db"]
+            exclude: ["README.md",]
         ),
         .executableTarget(
             name: "Memory",
@@ -76,8 +76,7 @@ var package = Package(
             dependencies: ["Libsql"],
             path: "Examples/Remote",
             exclude: [
-                "README.md", "local.db", "local.db-shm", "local.db-client_wal_index",
-                "local.db-wal",
+                "README.md", 
             ]
         ),
         .executableTarget(
@@ -85,15 +84,14 @@ var package = Package(
             dependencies: ["Libsql"],
             path: "Examples/Sync",
             exclude: [
-                "README.md", "local.db", "local.db-shm", "local.db-client_wal_index",
-                "local.db-wal",
+                "README.md", 
             ]
         ),
         .executableTarget(
             name: "Transactions",
             dependencies: ["Libsql"],
             path: "Examples/Transactions",
-            exclude: ["README.md", "local.db"]
+            exclude: ["README.md",]
         ),
         .executableTarget(
             name: "Vector",
