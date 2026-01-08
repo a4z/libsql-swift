@@ -29,7 +29,21 @@ On Linux, the package doesn't use an XCFramework. Instead, it builds the library
 
 ## Solution
 
-Create a symlink from the index-build directory to the actual library in the XCFramework:
+### Option 1: Configure SourceKit-LSP
+
+Create a `.sourcekit-lsp/config.json` file with:
+
+```json
+{
+  "backgroundPreparationMode": "build"
+}
+```
+
+This tells SourceKit-LSP to use the regular build system instead of the separate indexing build, which resolves the binary target issue. After creating this file and reloading VS Code, autocomplete and `@testable import` work correctly.
+
+### Option 2: Create Symlink (Alternative)
+
+If you prefer to keep the separate indexing build, create a symlink from the index-build directory to the actual library in the XCFramework:
 
 ```bash
 mkdir -p .build/index-build/arm64-apple-macosx/debug
@@ -41,7 +55,9 @@ After creating the symlink and reloading VS Code, autocomplete and `@testable im
 
 ## Potential Automation
 
-This symlink needs to be recreated if:
+**Note**: With the `.sourcekit-lsp/config.json` configuration (Option 1), no automation is needed as it's a one-time setup that's committed to the repository.
+
+With the symlink approach (Option 2), the symlink needs to be recreated if:
 
 - The `.build/` directory is cleaned
 - The project is cloned fresh

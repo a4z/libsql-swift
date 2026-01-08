@@ -55,6 +55,28 @@ final class LibsqlTests: XCTestCase {
         XCTAssertEqual(try stmt.query().next()!.getInt(0), 1)
     }
 
+    func testStatementWithNamedParams() throws {
+        let db = try Database(":memory:")
+        let conn = try db.connect()
+
+        // Test with single named parameter
+        let stmt1 = try conn.prepare("select :value").bind([":value": 42])
+        XCTAssertEqual(try stmt1.query().next()!.getInt(0), 42)
+
+        // Test with multiple named parameters
+        let stmt2 = try conn.prepare("select :a + :b").bind([":a": 10, ":b": 32])
+        XCTAssertEqual(try stmt2.query().next()!.getInt(0), 42)
+
+        // Test with different types
+        let stmt3 = try conn.prepare("select :name, :age, :score")
+            //.bind([":name": "Alice", ":age": 25, ":score": 95.5])
+            .bind([":age": 25, ":name": "Alice", ":score": 95.5])  // play with parameter order
+        let row = try stmt3.query().next()!
+        XCTAssertEqual(try row.getString(0), "Alice")
+        XCTAssertEqual(try row.getInt(1), 25)
+        XCTAssertEqual(try row.getDouble(2), 95.5)
+    }
+
     func testTransaction() throws {
         let db = try Database(":memory:")
         let conn = try db.connect()
