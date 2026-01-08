@@ -1,0 +1,184 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Query",
+            "target": "Query",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Query"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Query",
+            "target": "Query",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Query"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Transaction",
+            "target": "Transaction",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Transaction"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Transaction",
+            "target": "Transaction",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Transaction"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Batch",
+            "target": "Batch",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Batch"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Batch",
+            "target": "Batch",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Batch"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Vector",
+            "target": "Vector",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Vector"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Vector",
+            "target": "Vector",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Vector"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Transactions",
+            "target": "Transactions",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Transactions"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Transactions",
+            "target": "Transactions",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Transactions"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Sync",
+            "target": "Sync",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Sync"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Sync",
+            "target": "Sync",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Sync"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Remote",
+            "target": "Remote",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Remote"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Remote",
+            "target": "Remote",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Remote"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Memory",
+            "target": "Memory",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Memory"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Memory",
+            "target": "Memory",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Memory"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug Local",
+            "target": "Local",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Local"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release Local",
+            "target": "Local",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Local"
+        }
+    ]
+}

@@ -22,7 +22,7 @@ var package = Package(
                 .target(name: "CLibsql", condition: .when(platforms: [.macOS, .iOS])),
                 .target(name: "CLibsqlLinux", condition: .when(platforms: [.linux])),
             ],
-            
+
         ),
         .binaryTarget(name: "CLibsql", path: "Turso/CLibsql/CLibsql.xcframework"),
         .target(

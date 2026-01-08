@@ -21,10 +21,10 @@ xcrun llvm-cov show \
     .build/debug/LibsqlPackageTests.xctest/Contents/MacOS/LibsqlPackageTests \
     -instr-profile=.build/debug/codecov/default.profdata \
     -format=html \
-    -output-dir=.coverage-report
+    -output-dir=.build/.coverage-report
 
 # Open in browser
-open .coverage-report/index.html
+open .build/.coverage-report/index.html
 ```
 
 ### 2. Terminal Summary
@@ -53,7 +53,7 @@ xcrun llvm-cov show \
 ## Coverage Data Location
 
 - **Raw coverage data**: `.build/debug/codecov/default.profdata`
-- **HTML reports**: `.coverage-report/` (after generation)
+- **HTML reports**: `.build/.coverage-report/` (after generation)
 
 ---
 
@@ -101,10 +101,10 @@ xcrun llvm-cov show \
     .build/debug/LibsqlPackageTests.xctest/Contents/MacOS/LibsqlPackageTests \
     -instr-profile=.build/debug/codecov/default.profdata \
     -format=html \
-    -output-dir=.coverage-report
+    -output-dir=.build/.coverage-report
 
 # 2. Open and identify red (uncovered) lines
-open .coverage-report/index.html
+open .build/.coverage-report/index.html
 
 # 3. Add tests for those code paths
 
@@ -134,7 +134,7 @@ The coverage data and reports can be removed:
 rm -rf .build/debug/codecov
 
 # Remove HTML reports
-rm -rf .coverage-report
+rm -rf .build/.coverage-report
 
 # Full clean
 swift package clean

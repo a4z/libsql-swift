@@ -41,6 +41,8 @@ Create a `.sourcekit-lsp/config.json` file with:
 
 This tells SourceKit-LSP to use the regular build system instead of the separate indexing build, which resolves the binary target issue. After creating this file and reloading VS Code, autocomplete and `@testable import` work correctly.
 
+See <https://github.com/swiftlang/sourcekit-lsp/blob/main/Documentation/Configuration%20File.md> for more info
+
 ### Option 2: Create Symlink (Alternative)
 
 If you prefer to keep the separate indexing build, create a symlink from the index-build directory to the actual library in the XCFramework:
