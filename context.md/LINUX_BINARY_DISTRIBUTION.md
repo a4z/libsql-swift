@@ -16,10 +16,12 @@ Building the Rust-based `libsql-c` library from source on every CI run is slow c
 SPM supports `.binaryTarget` with artifactbundles on Linux (since Swift 5.6), but has limitations.
 
 **Pros:**
+
 - "Official" SPM way to distribute binaries
 - Automatic download and caching by SPM
 
 **Cons:**
+
 - ⚠️ **Poor platform detection**: SPM's artifactbundle `supportedTriples` only matches exact platform strings
 - Requires exact match for `x86_64-unknown-linux-gnu` - doesn't account for Ubuntu version, glibc version, etc.
 - ABI compatibility issues across different Linux distributions
@@ -27,7 +29,8 @@ SPM supports `.binaryTarget` with artifactbundles on Linux (since Swift 5.6), bu
 - Still experimental feel
 
 **Structure:**
-```
+
+```txt
 libsql-linux-x86_64.artifactbundle/
 ├── info.json
 └── libsql-linux-x86_64/
@@ -35,6 +38,7 @@ libsql-linux-x86_64.artifactbundle/
 ```
 
 **info.json:**
+
 ```json
 {
   "schemaVersion": "1.0",
@@ -54,6 +58,7 @@ libsql-linux-x86_64.artifactbundle/
 ```
 
 **Package.swift:**
+
 ```swift
 .binaryTarget(
     name: "CLibsqlLinuxBinary",
@@ -71,6 +76,7 @@ libsql-linux-x86_64.artifactbundle/
 Enhance the existing `BuildLibsqlPlugin` to download a pre-built binary when available, with fallback to building from source.
 
 **Pros:**
+
 - ✅ Fast CI builds when binary is available
 - ✅ Graceful fallback to source build for development
 - ✅ Simple environment variable control
@@ -79,6 +85,7 @@ Enhance the existing `BuildLibsqlPlugin` to download a pre-built binary when ava
 - ✅ Can version-control with git tags or releases
 
 **Cons:**
+
 - Custom implementation (not "pure" SPM)
 - Need to host the binary somewhere (GitHub Releases works great)
 
@@ -89,6 +96,7 @@ Enhance the existing `BuildLibsqlPlugin` to download a pre-built binary when ava
 3. **If not set**: Build from source with cargo (current behavior)
 
 **Modified plugin logic:**
+
 ```swift
 #if os(Linux)
 private func createLinuxBuildCommands(context: PluginContext) throws -> [Command] {
@@ -122,12 +130,14 @@ private func createLinuxBuildCommands(context: PluginContext) throws -> [Command
 **Usage:**
 
 **CI (fast):**
+
 ```bash
 export LIBSQL_PREBUILT_BINARY_URL="https://github.com/YOUR_ORG/libsql-swift/releases/download/v1.0.0/liblibsql-ubuntu24.a"
 swift build
 ```
 
 **Development (build from source):**
+
 ```bash
 swift build  # No env var = builds from source
 ```
@@ -141,16 +151,19 @@ swift build  # No env var = builds from source
 Commit the pre-built `liblibsql.a` directly to the repository and skip the plugin on Linux.
 
 **Pros:**
+
 - Fastest: no download, no build
 - Simple: just link against checked-in file
 
 **Cons:**
+
 - ❌ Bloats git repository (~20-30MB binary)
 - ❌ Makes git clones slower
 - ❌ Harder to update (need to rebuild and commit)
 - ❌ Git LFS might be needed
 
 **Structure:**
+
 ```
 Turso/CLibsqlLinux/
 ├── include/
@@ -161,6 +174,7 @@ Turso/CLibsqlLinux/
 ```
 
 **Package.swift:**
+
 ```swift
 .target(
     name: "CLibsqlLinux",
@@ -180,7 +194,7 @@ Turso/CLibsqlLinux/
 
 ### Step 1: Build and Release Binary
 
-Create `scripts/build-linux-release.sh`:
+Create `Turso/scripts/build-linux-release.sh`:
 
 ```bash
 #!/bin/bash
@@ -205,8 +219,9 @@ echo "  gh release create v${VERSION} ${OUTPUT_NAME}"
 ```
 
 **Run on Ubuntu 24.04:**
+
 ```bash
-./scripts/build-linux-release.sh 1.0.0
+./Turso/scripts/build-linux-release.sh 1.0.0
 gh release create v1.0.0 liblibsql-ubuntu24-1.0.0.a
 ```
 
@@ -258,11 +273,13 @@ swift build
 **Target platform:** Ubuntu 24.04 LTS x86_64
 
 **Dependencies:**
+
 - Built with: `x86_64-unknown-linux-gnu` target
 - Links against: glibc (system version on Ubuntu 24.04)
 - Static library: includes all Rust dependencies
 
 **Compatibility:**
+
 - ✅ Same Ubuntu version (24.04)
 - ✅ Same architecture (x86_64)
 - ⚠️ Other Ubuntu versions: likely works, but test
@@ -270,6 +287,7 @@ swift build
 - ❌ Different architectures (ARM): need separate builds
 
 **Recommendation:**
+
 - Build on Ubuntu 24.04 for Ubuntu 24.04
 - If supporting multiple distros, create separate binaries per distro
 - Always provide source build fallback
@@ -279,6 +297,7 @@ swift build
 ## File Locations
 
 **Current:**
+
 ```
 Turso/
 ├── CLibsql/
@@ -291,6 +310,7 @@ Turso/
 ```
 
 **With pre-built binary (Option 2):**
+
 ```
 # Binary hosted on GitHub Releases, not in repo
 https://github.com/YOUR_ORG/libsql-swift/releases/download/v1.0.0/liblibsql-ubuntu24-1.0.0.a
@@ -300,6 +320,7 @@ https://github.com/YOUR_ORG/libsql-swift/releases/download/v1.0.0/liblibsql-ubun
 ```
 
 **With vendored binary (Option 3):**
+
 ```
 Turso/CLibsqlLinux/
 ├── include/libsql.h
@@ -333,6 +354,7 @@ Turso/CLibsqlLinux/
 Before deploying binary distribution:
 
 1. **Build binary on clean Ubuntu 24.04:**
+
    ```bash
    docker run -it --rm -v $PWD:/workspace ubuntu:24.04 bash
    # Install Rust + build
@@ -344,17 +366,20 @@ Before deploying binary distribution:
    - Different Swift versions
 
 3. **Verify symbols:**
+
    ```bash
    nm -D liblibsql.a | grep libsql_
    file liblibsql.a
    ```
 
 4. **Size check:**
+
    ```bash
    ls -lh liblibsql.a  # Should be ~20-30MB
    ```
 
 5. **Run full test suite:**
+
    ```bash
    LIBSQL_PREBUILT_BINARY_URL="file:///path/to/liblibsql.a" swift test
    ```
@@ -366,6 +391,7 @@ Before deploying binary distribution:
 ✅ **Implement Option 2: Plugin with Binary Download**
 
 **Why:**
+
 - Fastest for CI (binary download is much faster than cargo build)
 - Flexible: env var controls behavior
 - Safe: fallback to source build always available
@@ -373,7 +399,8 @@ Before deploying binary distribution:
 - Simple: small plugin modification
 
 **Next steps:**
-1. Create `scripts/build-linux-release.sh`
+
+1. Create `Turso/scripts/build-linux-release.sh`
 2. Build binary on Ubuntu 24.04
 3. Upload to GitHub Releases
 4. Modify `BuildLibsqlPlugin` to check env var
