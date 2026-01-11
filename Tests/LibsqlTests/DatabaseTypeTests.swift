@@ -85,7 +85,8 @@ final class DatabaseTypeTests: XCTestCase {
         // Test :memory: database
         do {
             var conn: Connection!
-            try autoreleasepool {
+            // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
+            do {
                 let db = try Database(":memory:")
                 conn = try db.connect()
                 _ = try conn.execute("CREATE TABLE test (id INTEGER)")
@@ -100,7 +101,8 @@ final class DatabaseTypeTests: XCTestCase {
         // Test file-based database
         do {
             var conn: Connection!
-            try autoreleasepool {
+            // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
+            do {
                 let db = try Database("test_file_based.db")
                 conn = try db.connect()
                 try setupCleanTable(conn, "CREATE TABLE test (id INTEGER)")
