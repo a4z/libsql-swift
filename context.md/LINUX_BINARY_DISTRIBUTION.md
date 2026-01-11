@@ -294,6 +294,44 @@ swift build
 
 ---
 
+## Static Linux SDK (musl) Option
+
+Swift provides a Static Linux SDK (musl) that can build fully static Linux
+executables. This can avoid distro/glibc compatibility concerns, but it
+comes with constraints.
+
+**Key points:**
+
+- Requires the open-source Swift toolchain (not the Xcode toolchain).
+- Install SDKs with `swift sdk install <URL> --checksum <checksum>`.
+- Build with `swift build --swift-sdk x86_64-swift-linux-musl` or
+  `--swift-sdk aarch64-swift-linux-musl`.
+- No dynamic linking; `dlopen()` is not supported.
+- Any C/Rust deps must be built for musl too (for example,
+  `x86_64-unknown-linux-musl`).
+- Some packages may need conditional imports (`import Musl` vs
+  `import Glibc`).
+
+**Implication for libsql-swift:**
+
+- We could ship a `*-musl` artifact bundle to make Linux builds more
+  portable across distros.
+- This is an alternative to the Ubuntu 24.04 glibc binaries, not a
+  replacement.
+
+---
+
+## Static Linking Verification (Final App)
+
+- Build the app with the Static Linux SDK (`swift build --swift-sdk ...`).
+- Verify the output:
+  - `file` should report "statically linked".
+  - `ldd` should report "not a dynamic executable".
+- If any dependency cannot be statically linked, the final app link will
+  fail. That is the signal to fix or replace the dependency.
+
+---
+
 ## File Locations
 
 **Current:**
