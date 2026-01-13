@@ -12,8 +12,7 @@ final class MemoryManagementTests: XCTestCase {
     func testRapidAllocationDeallocation() throws {
         // Create and destroy many database/connection pairs
         for i in 0..<1000 {
-            // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-            do {
+            try autoreleasepool {
                 let db = try Database(":memory:")
                 let conn = try db.connect()
                 _ = try conn.execute("CREATE TABLE test\(i) (id INTEGER)")
@@ -35,8 +34,7 @@ final class MemoryManagementTests: XCTestCase {
 
         // Create many connections, all outliving their databases
         for i in 0..<100 {
-            // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-            do {
+            try autoreleasepool {
                 let db = try Database(":memory:")
                 let conn = try db.connect()
                 _ = try conn.execute("CREATE TABLE test (id INTEGER)")
@@ -79,9 +77,7 @@ final class MemoryManagementTests: XCTestCase {
     /// Claim: Connection maintains full functionality
     func testLargeDataOperationsAfterDatabaseFreed() throws {
         var conn: Connection!
-
-        // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-        do {
+        try autoreleasepool {
             let db = try Database(":memory:")
             conn = try db.connect()
             _ = try conn.execute("CREATE TABLE test (id INTEGER, data TEXT)")
@@ -106,13 +102,10 @@ final class MemoryManagementTests: XCTestCase {
     /// Claim: All connection features remain functional
     func testBatchOperationsAfterDatabaseFreed() throws {
         var conn: Connection!
-
-        // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-        do {
+        try autoreleasepool {
             let db = try Database(":memory:")
             conn = try db.connect()
         }
-
         // Batch creation and insertion
         try conn.executeBatch(
             """

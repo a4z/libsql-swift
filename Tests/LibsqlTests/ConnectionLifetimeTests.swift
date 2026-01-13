@@ -13,8 +13,8 @@ final class ConnectionLifetimeTests: XCTestCase {
         var conn: Connection!
 
         // Database goes out of scope here
-        // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-        do {
+
+        try autoreleasepool {
             let db = try Database(":memory:")
             conn = try db.connect()
             _ = try conn.execute("CREATE TABLE test (id INTEGER)")
@@ -69,8 +69,7 @@ final class ConnectionLifetimeTests: XCTestCase {
     func testMultipleOperationsAfterDatabaseFreed() throws {
         var conn: Connection!
 
-        // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-        do {
+        try autoreleasepool {
             let db = try Database(":memory:")
             conn = try db.connect()
             _ = try conn.execute("CREATE TABLE users (id INTEGER, name TEXT)")
@@ -118,8 +117,7 @@ final class ConnectionLifetimeTests: XCTestCase {
     func testPreparedStatementAfterDatabaseFreed() throws {
         var conn: Connection!
 
-        // TODO: Should be autoreleasepool, but Linux doesn't support it - maybe implement cross-platform version later
-        do {
+        try autoreleasepool {
             let db = try Database(":memory:")
             conn = try db.connect()
             _ = try conn.execute("CREATE TABLE test (value INTEGER)")
