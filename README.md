@@ -1,3 +1,11 @@
+# This is my opinionated developer branch of tursodatabase/libsql-swift
+
+Use on own risk, this is not official Turso, this is what I experiment with, and need.
+
+WIP, work in progress
+
+## About
+
 <p align="center">
   <a href="https://tur.so/turso-swift">
     <picture>

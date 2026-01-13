@@ -29,3 +29,6 @@ are specified ans NextTaskN.md document in the `prompt.md` folder.
 Where N defines the order of the tasks. The N number can be 1 to 9999 or even higher
 
 We always work on the latest NextTask number, if not otherwise specified.
+
+Important: NextTask documents in prompt.md folder can already be done, they are not required to be next tasks.
+Check the latest number, this one might be in progress.
