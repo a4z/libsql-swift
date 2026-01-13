@@ -1,0 +1,5 @@
+module CLibsqlLinux {
+    header "include/libsql.h"
+    link "libsql"
+    export *
+}

@@ -6,20 +6,42 @@ import PackageDescription
 
 var package = Package(
     name: "Libsql",
-    platforms: [ .iOS(.v12), .macOS(.v10_13) ],
+    platforms: [.iOS(.v12), .macOS(.v10_13)],
     products: [
         .library(name: "Libsql", targets: ["Libsql"]),
-        
+
         // Examples
         .executable(name: "Query", targets: ["Query"]),
         .executable(name: "Transaction", targets: ["Transaction"]),
         .executable(name: "Batch", targets: ["Batch"]),
     ],
     targets: [
-        .target(name: "Libsql", dependencies: ["CLibsql"]),
-        .binaryTarget(name: "CLibsql", path: "Sources/CLibsql/CLibsql.xcframework"),
+        .target(
+            name: "Libsql",
+            dependencies: [
+                .target(name: "CLibsql", condition: .when(platforms: [.macOS, .iOS])),
+                .target(name: "CLibsqlLinux", condition: .when(platforms: [.linux])),
+            ],
+
+        ),
+        .binaryTarget(name: "CLibsql", path: "Turso/CLibsql/CLibsql.xcframework"),
+        .target(
+            name: "CLibsqlLinux",
+            path: "Turso/CLibsqlLinux",
+            linkerSettings: [
+                .unsafeFlags([
+                    "-L", ".build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin/release",
+                    "-l:liblibsql.a"
+                ], .when(platforms: [.linux]))
+            ],
+            plugins: ["BuildLibsqlPlugin"]
+        ),
+        .plugin(
+            name: "BuildLibsqlPlugin",
+            capability: .buildTool()
+        ),
         .testTarget(name: "LibsqlTests", dependencies: ["Libsql"]),
-       
+
         // Examples
         .executableTarget(
             name: "Query",
@@ -41,7 +63,7 @@ var package = Package(
             name: "Local",
             dependencies: ["Libsql"],
             path: "Examples/Local",
-            exclude: ["README.md", "local.db"]
+            exclude: ["README.md",]
         ),
         .executableTarget(
             name: "Memory",
@@ -53,19 +75,23 @@ var package = Package(
             name: "Remote",
             dependencies: ["Libsql"],
             path: "Examples/Remote",
-            exclude: ["README.md", "local.db", "local.db-shm", "local.db-client_wal_index", "local.db-wal"]
+            exclude: [
+                "README.md", 
+            ]
         ),
         .executableTarget(
             name: "Sync",
             dependencies: ["Libsql"],
             path: "Examples/Sync",
-            exclude: ["README.md", "local.db", "local.db-shm", "local.db-client_wal_index", "local.db-wal"]
+            exclude: [
+                "README.md", 
+            ]
         ),
         .executableTarget(
             name: "Transactions",
             dependencies: ["Libsql"],
             path: "Examples/Transactions",
-            exclude: ["README.md", "local.db"]
+            exclude: ["README.md",]
         ),
         .executableTarget(
             name: "Vector",
