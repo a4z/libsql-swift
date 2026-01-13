@@ -8,27 +8,46 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
 VERSION="$1"
 TRIPLE="${4:-${LIBSQL_TRIPLE:-x86_64-unknown-linux-gnu}}"
 ARCH="${TRIPLE%%-*}"
-BUNDLE_NAME="${5:-libsql-linux-${ARCH}}"
-LIB_PATH="${2:-Turso/CLibsql/libsql-c/target/${TRIPLE}/release/liblibsql.a}"
-OUT_DIR="${3:-.build/artifacts}"
+BUNDLE_NAME="${5:-CLibsqlLinux}"
+ARTIFACT_NAME="${LIBSQL_ARTIFACT_NAME:-CLibsql}"
+VARIANT_NAME="${ARTIFACT_NAME}-${ARCH}"
+VARIANT_PATH="${VARIANT_NAME}/liblibsql.a"
+LIBSQL_C_DIR="${ROOT_DIR}/Turso/CLibsql/libsql-c"
+LIBSQL_HEADER="${LIBSQL_C_DIR}/libsql.h"
+MODULEMAP="${ROOT_DIR}/Turso/CLibsqlLinux/module.modulemap"
+OUT_DIR="${3:-${ROOT_DIR}/Turso}"
 BUNDLE_DIR="${OUT_DIR}/${BUNDLE_NAME}.artifactbundle"
-ARTIFACT_DIR="${BUNDLE_DIR}/${BUNDLE_NAME}"
+ARTIFACT_DIR="${BUNDLE_DIR}/${VARIANT_NAME}"
 INFO_JSON="${BUNDLE_DIR}/info.json"
 ZIP_PATH="${OUT_DIR}/${BUNDLE_NAME}.artifactbundle.zip"
 
-HEADER_DIR="Turso/CLibsqlLinux/include"
-MODULEMAP="Turso/CLibsqlLinux/module.modulemap"
+LIB_PATH="${2:-}"
+if [ -z "$LIB_PATH" ]; then
+  LIB_PATH="${LIBSQL_C_DIR}/target/${TRIPLE}/release/liblibsql.a"
+  if [ "${LIBSQL_FORCE_BUILD:-0}" -eq 1 ] || [ ! -f "$LIB_PATH" ]; then
+    (
+      cd "$LIBSQL_C_DIR"
+      CARGO_TMPDIR="${LIBSQL_C_DIR}/target/tmp"
+      mkdir -p "$CARGO_TMPDIR"
+      TMPDIR="$CARGO_TMPDIR" RUSTC_TMPDIR="$CARGO_TMPDIR" \
+        cargo build --release --features encryption --target "$TRIPLE"
+    )
+  fi
+fi
 
 if [ ! -f "$LIB_PATH" ]; then
   echo "Missing lib: $LIB_PATH" >&2
   exit 1
 fi
 
-if [ ! -f "${HEADER_DIR}/libsql.h" ]; then
-  echo "Missing header: ${HEADER_DIR}/libsql.h" >&2
+if [ ! -f "$LIBSQL_HEADER" ]; then
+  echo "Missing header: $LIBSQL_HEADER" >&2
   exit 1
 fi
 
@@ -38,23 +57,27 @@ if [ ! -f "$MODULEMAP" ]; then
 fi
 
 rm -rf "$BUNDLE_DIR"
-mkdir -p "$ARTIFACT_DIR/lib" "$ARTIFACT_DIR/include" "$OUT_DIR"
+mkdir -p "$ARTIFACT_DIR" "$BUNDLE_DIR/include" "$OUT_DIR"
 
-cp "$LIB_PATH" "$ARTIFACT_DIR/lib/liblibsql.a"
-cp "${HEADER_DIR}/libsql.h" "$ARTIFACT_DIR/include/libsql.h"
-cp "$MODULEMAP" "$ARTIFACT_DIR/module.modulemap"
+cp "$LIB_PATH" "$ARTIFACT_DIR/liblibsql.a"
+cp "$LIBSQL_HEADER" "$BUNDLE_DIR/include/libsql.h"
+cp "$MODULEMAP" "$BUNDLE_DIR/module.modulemap"
 
 cat > "$INFO_JSON" <<INFO
 {
   "schemaVersion": "1.0",
   "artifacts": {
-    "${BUNDLE_NAME}": {
+    "${ARTIFACT_NAME}": {
       "version": "${VERSION}",
-      "type": "library",
+      "type": "staticLibrary",
       "variants": [
         {
-          "path": "${BUNDLE_NAME}",
-          "supportedTriples": ["${TRIPLE}"]
+          "path": "${VARIANT_PATH}",
+          "supportedTriples": ["${TRIPLE}"],
+          "staticLibraryMetadata": {
+            "headerPaths": ["include"],
+            "moduleMapPath": "module.modulemap"
+          }
         }
       ]
     }
@@ -67,7 +90,13 @@ INFO
   zip -r "${BUNDLE_NAME}.artifactbundle.zip" "${BUNDLE_NAME}.artifactbundle" >/dev/null
 )
 
-CHECKSUM=$(swift package compute-checksum "$ZIP_PATH")
+if [ -n "${SWIFTPM_BIN:-}" ]; then
+  CHECKSUM=$("$SWIFTPM_BIN" compute-checksum "$ZIP_PATH")
+elif command -v swift-package >/dev/null 2>&1; then
+  CHECKSUM=$(swift-package compute-checksum "$ZIP_PATH")
+else
+  CHECKSUM=$(swift package compute-checksum "$ZIP_PATH")
+fi
 
 echo "Created: $ZIP_PATH"
 echo "Checksum: $CHECKSUM"

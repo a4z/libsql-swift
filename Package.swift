@@ -4,6 +4,19 @@
 import Foundation
 import PackageDescription
 
+let libsqlDependencies: [Target.Dependency] = ["CLibsql"]
+
+#if os(Linux)
+let binaryDependencyPath = "Turso/CLibsqlLinux.artifactbundle.zip"
+#else
+let binaryDependencyPath = "Turso/CLibsql/CLibsql.xcframework"
+#endif
+
+let clibsqlTarget: Target = .binaryTarget(
+    name: "CLibsql",
+    path: binaryDependencyPath
+)
+
 var package = Package(
     name: "Libsql",
     platforms: [.iOS(.v12), .macOS(.v10_13)],
@@ -18,28 +31,10 @@ var package = Package(
     targets: [
         .target(
             name: "Libsql",
-            dependencies: [
-                .target(name: "CLibsql", condition: .when(platforms: [.macOS, .iOS])),
-                .target(name: "CLibsqlLinux", condition: .when(platforms: [.linux])),
-            ],
+            dependencies: libsqlDependencies
 
         ),
-        .binaryTarget(name: "CLibsql", path: "Turso/CLibsql/CLibsql.xcframework"),
-        .target(
-            name: "CLibsqlLinux",
-            path: "Turso/CLibsqlLinux",
-            linkerSettings: [
-                .unsafeFlags([
-                    "-L", ".build/plugins/outputs/libsql-swift/CLibsqlLinux/destination/BuildLibsqlPlugin/release",
-                    "-l:liblibsql.a"
-                ], .when(platforms: [.linux]))
-            ],
-            plugins: ["BuildLibsqlPlugin"]
-        ),
-        .plugin(
-            name: "BuildLibsqlPlugin",
-            capability: .buildTool()
-        ),
+        clibsqlTarget,
         .testTarget(name: "LibsqlTests", dependencies: ["Libsql"]),
 
         // Examples
