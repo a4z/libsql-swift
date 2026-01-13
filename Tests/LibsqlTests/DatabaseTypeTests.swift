@@ -9,6 +9,18 @@ final class DatabaseTypeTests: XCTestCase {
 
     // MARK: - Test Lifecycle
 
+    private var tempDir = TempDir()
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        try tempDir.setup()
+    }
+
+    override func tearDownWithError() throws {
+        tempDir.cleanup()
+        try super.tearDownWithError()
+    }
+
     /// Helper: Setup a clean test table using a transaction
     private func setupCleanTable(_ conn: Connection, _ sql: String) throws {
         let tx = try conn.transaction()
@@ -20,14 +32,6 @@ final class DatabaseTypeTests: XCTestCase {
             """)
     }
 
-    override func tearDown() {
-        super.tearDown()
-        // Clean up any test database files
-        try? FileManager.default.removeItem(atPath: "test_file_based.db")
-        try? FileManager.default.removeItem(atPath: "test_file_based.db-shm")
-        try? FileManager.default.removeItem(atPath: "test_file_based.db-wal")
-    }
-
     // MARK: - Parameterized Test Helpers
 
     /// Database configuration for testing
@@ -36,19 +40,20 @@ final class DatabaseTypeTests: XCTestCase {
         let path: String
         let supportsMultipleConnections: Bool
 
-        static let memory = DatabaseConfig(
-            name: "memory",
-            path: ":memory:",
-            supportsMultipleConnections: false
-        )
-
-        static let file = DatabaseConfig(
-            name: "file",
-            path: "test_file_based.db",
-            supportsMultipleConnections: true
-        )
-
-        static let allConfigs = [memory, file]
+        static func allConfigs(filePath: String) -> [DatabaseConfig] {
+            [
+                DatabaseConfig(
+                    name: "memory",
+                    path: ":memory:",
+                    supportsMultipleConnections: false
+                ),
+                DatabaseConfig(
+                    name: "file",
+                    path: filePath,
+                    supportsMultipleConnections: true
+                ),
+            ]
+        }
     }
 
     /// Helper method to run a test with multiple database configurations
@@ -67,7 +72,10 @@ final class DatabaseTypeTests: XCTestCase {
 
     /// Test: Single connection works for all database types
     func testSingleConnectionWorks() throws {
-        try runTest(configs: DatabaseConfig.allConfigs) { config, db in
+        try runTest(
+            configs: DatabaseConfig.allConfigs(filePath: tempDir.path("test_file_based.db"))
+        ) {
+            config, db in
             let conn = try db.connect()
             try setupCleanTable(conn, "CREATE TABLE test (id INTEGER)")
             _ = try conn.execute("INSERT INTO test VALUES (42)")
@@ -102,7 +110,8 @@ final class DatabaseTypeTests: XCTestCase {
             var conn: Connection!
             
             try autoreleasepool {
-                let db = try Database("test_file_based.db")
+                let dbPath = tempDir.path("test_file_based.db")
+                let db = try Database(dbPath)
                 conn = try db.connect()
                 try setupCleanTable(conn, "CREATE TABLE test (id INTEGER)")
                 _ = try conn.execute("INSERT INTO test VALUES (2)")
@@ -144,7 +153,8 @@ final class DatabaseTypeTests: XCTestCase {
 
     /// Test: File-based databases share state across connections
     func testFileDatabaseSharing() throws {
-        let db = try Database("test_file_based.db")
+        let dbPath = tempDir.path("test_file_based.db")
+        let db = try Database(dbPath)
         let conn1 = try db.connect()
         let conn2 = try db.connect()
 
@@ -173,7 +183,7 @@ final class DatabaseTypeTests: XCTestCase {
         // This demonstrates how to write a test that has different expectations
         // based on database type (a common pattern in parameterized testing)
 
-        for config in DatabaseConfig.allConfigs {
+        for config in DatabaseConfig.allConfigs(filePath: tempDir.path("test_file_based.db")) {
             let db = try Database(config.path)
             let conn1 = try db.connect()
             let conn2 = try db.connect()
@@ -237,7 +247,8 @@ final class DatabaseTypeTests: XCTestCase {
             var size: Int { connections.count }
         }
 
-        let pool = try ConnectionPool(path: "test_file_based.db", poolSize: 5)
+        let dbPath = tempDir.path("test_file_based.db")
+        let pool = try ConnectionPool(path: dbPath, poolSize: 5)
 
         // All connections should share state
         for i in 0..<5 {
@@ -301,7 +312,8 @@ final class DatabaseTypeTests: XCTestCase {
 
         // PATTERN 2: Use file database for shared state
         func sharedStateTest() throws {
-            let db = try Database("test_file_based.db")
+            let dbPath = tempDir.path("test_file_based.db")
+            let db = try Database(dbPath)
             let conn1 = try db.connect()
             let conn2 = try db.connect()
 

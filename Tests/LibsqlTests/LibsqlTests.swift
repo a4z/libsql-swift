@@ -4,13 +4,26 @@ import XCTest
 @testable import Libsql
 
 final class LibsqlTests: XCTestCase {
+    private var tempDir = TempDir()
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        try tempDir.setup()
+    }
+
+    override func tearDownWithError() throws {
+        tempDir.cleanup()
+        try super.tearDownWithError()
+    }
+
     func testOpenDbMemory() throws {
         let db = try Database(":memory:")
         let _ = try db.connect()
     }
 
     func testOpenDbFile() throws {
-        let db = try Database("test.db")
+        let dbPath = tempDir.path("test.db")
+        let db = try Database(dbPath)
         let _ = try db.connect()
     }
 

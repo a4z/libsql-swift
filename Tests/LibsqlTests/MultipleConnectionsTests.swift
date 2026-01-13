@@ -8,6 +8,18 @@ import XCTest
 /// This validates the Arc-based resource sharing in Rust.
 final class MultipleConnectionsTests: XCTestCase {
 
+    private var tempDir = TempDir()
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        try tempDir.setup()
+    }
+
+    override func tearDownWithError() throws {
+        tempDir.cleanup()
+        try super.tearDownWithError()
+    }
+
     /// Helper: Setup a clean test table using a transaction
     private func setupCleanTable(_ conn: Connection, _ sql: String) throws {
         let tx = try conn.transaction()
@@ -22,7 +34,8 @@ final class MultipleConnectionsTests: XCTestCase {
     /// Test: Multiple connections share state
     /// Claim: "Multiple connections share the same underlying database"
     func testMultipleConnectionsShareState() throws {
-        let db = try Database("test_multiple.db")
+        let dbPath = tempDir.path("test_multiple.db")
+        let db = try Database(dbPath)
         let conn1 = try db.connect()
         let conn2 = try db.connect()
 
@@ -36,7 +49,8 @@ final class MultipleConnectionsTests: XCTestCase {
     /// Test: Three connections all sharing state
     /// Claim: Arc supports multiple concurrent references
     func testThreeConnectionsShareState() throws {
-        let db = try Database("test_three.db")
+        let dbPath = tempDir.path("test_three.db")
+        let db = try Database(dbPath)
         let conn1 = try db.connect()
         let conn2 = try db.connect()
         let conn3 = try db.connect()
@@ -71,7 +85,8 @@ final class MultipleConnectionsTests: XCTestCase {
     /// Test: Connections created at different times
     /// Claim: New connections can be created even after some are freed
     func testConnectionsCreatedSequentially() throws {
-        let db = try Database("test_sequential.db")
+        let dbPath = tempDir.path("test_sequential.db")
+        let db = try Database(dbPath)
         var connections: [Connection] = []
 
         // Create first connection
@@ -105,8 +120,8 @@ final class MultipleConnectionsTests: XCTestCase {
             private var connections: [Connection] = []
             private let db: Database
 
-            init(poolSize: Int) throws {
-                db = try Database("test_pool.db")
+            init(path: String, poolSize: Int) throws {
+                db = try Database(path)
                 for _ in 0..<poolSize {
                     connections.append(try db.connect())
                 }
@@ -126,7 +141,8 @@ final class MultipleConnectionsTests: XCTestCase {
             }
         }
 
-        let pool = try ConnectionPool(poolSize: 5)
+        let dbPath = tempDir.path("test_pool.db")
+        let pool = try ConnectionPool(path: dbPath, poolSize: 5)
 
         // All pooled connections should work
         for i in 0..<5 {
@@ -147,7 +163,8 @@ final class MultipleConnectionsTests: XCTestCase {
     /// Test: Simultaneous operations on multiple connections
     /// Claim: Thread-safe by design (Arc + Send + Sync)
     func testSimultaneousOperations() throws {
-        let db = try Database("test_simultaneous.db")
+        let dbPath = tempDir.path("test_simultaneous.db")
+        let db = try Database(dbPath)
         let conn1 = try db.connect()
         let conn2 = try db.connect()
 
