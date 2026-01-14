@@ -7,7 +7,15 @@ import PackageDescription
 let libsqlDependencies: [Target.Dependency] = ["CLibsql"]
 
 #if os(Linux)
-let binaryDependencyPath = "Turso/CLibsqlLinux.artifactbundle.zip"
+let binaryDependencyPath: String = {
+    #if arch(x86_64)
+    return "Turso/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle.zip"
+    #elseif arch(arm64)
+    return "Turso/CLibsqlLinux-aarch64-unknown-linux-gnu.artifactbundle.zip"
+    #else
+    fatalError("Unsupported Linux architecture.")
+    #endif
+}()
 #else
 let binaryDependencyPath = "Turso/CLibsql/CLibsql.xcframework"
 #endif

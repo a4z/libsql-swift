@@ -1,9 +1,9 @@
-# Linux Binary Matrix (GNU + musl)
+# Linux Binary Matrix (Ubuntu 24.04 GNU)
 
 ## Goal
 
-Add Linux ARM and musl support by shipping four separate artifactbundles
-and selecting them by target triple.
+Add Linux ARM support by shipping two separate artifactbundles for
+Ubuntu 24.04 (x86_64 + aarch64) and selecting them by target triple.
 
 ## Decisions
 
@@ -17,7 +17,7 @@ and selecting them by target triple.
 1. Update build tooling
    - Extend `Turso/scripts/build-linux-artifactbundle.sh` to allow a
      triple-based archive name.
-   - Add a wrapper script to build all four artifacts in one run.
+   - Add a wrapper script to build both artifacts in one run.
 2. Update `Package.swift`
    - Compute `binaryDependencyPath` from `LIBSQL_LINUX_TRIPLE`, or
      from `#if arch(...)` defaults.
@@ -27,10 +27,12 @@ and selecting them by target triple.
    - `context.md/LINUX_BUILD_STRATEGY.md`
 4. Validate
    - `swift build` on Linux gnu (x86_64 and arm64).
-   - musl build using Swift Static Linux SDK.
    - Confirm the correct artifact is selected.
+
+## Notes
+
+- Static linking (musl) is postponed and tracked for a later task.
 
 ## Questions
 
 - Final artifact naming scheme?
-- Do we want any auto-detection of musl, or env-var only?

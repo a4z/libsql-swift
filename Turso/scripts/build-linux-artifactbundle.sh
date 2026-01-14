@@ -12,9 +12,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 VERSION="$1"
-TRIPLE="${4:-${LIBSQL_TRIPLE:-x86_64-unknown-linux-gnu}}"
+detect_triple() {
+  local arch
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64) echo "x86_64-unknown-linux-gnu" ;;
+    aarch64|arm64) echo "aarch64-unknown-linux-gnu" ;;
+    *) echo "x86_64-unknown-linux-gnu" ;;
+  esac
+}
+
+TRIPLE="${4:-${LIBSQL_TRIPLE:-$(detect_triple)}}"
 ARCH="${TRIPLE%%-*}"
-BUNDLE_NAME="${5:-CLibsqlLinux}"
+BUNDLE_NAME="${5:-CLibsqlLinux-${TRIPLE}}"
 ARTIFACT_NAME="${LIBSQL_ARTIFACT_NAME:-CLibsql}"
 VARIANT_NAME="${ARTIFACT_NAME}-${ARCH}"
 VARIANT_PATH="${VARIANT_NAME}/liblibsql.a"

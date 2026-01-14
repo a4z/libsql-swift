@@ -2,8 +2,8 @@
 
 ## Goal
 
-Build fast on Linux without compiling Rust each time, while supporting
-both glibc and musl targets.
+Build fast on Ubuntu 24.04 without compiling Rust each time, for both
+x86_64 and aarch64.
 
 ## Short History
 
@@ -14,7 +14,7 @@ both glibc and musl targets.
 ## Current State
 
 - macOS/iOS uses `Turso/CLibsql/CLibsql.xcframework`.
-- Linux uses `Turso/CLibsqlLinux.artifactbundle.zip`.
+- Linux uses `Turso/CLibsqlLinux-<triple>.artifactbundle.zip`.
 - `BuildLibsqlPlugin` still exists but is not the default path.
 
 ## Strategy
@@ -30,8 +30,6 @@ both glibc and musl targets.
 
 - `x86_64-unknown-linux-gnu`
 - `aarch64-unknown-linux-gnu`
-- `x86_64-unknown-linux-musl`
-- `aarch64-unknown-linux-musl`
 
 ## Selection
 
@@ -42,12 +40,6 @@ both glibc and musl targets.
 
 `Turso/scripts/build-linux-artifactbundle.sh` builds one archive for a
 single triple. A small wrapper script will build all four variants.
-
-## musl Build Notes
-
-- Requires the Swift Static Linux SDK.
-- Build libsql-c with the matching musl target.
-- Use the same triple in `LIBSQL_LINUX_TRIPLE`.
 
 ## Fallback
 
