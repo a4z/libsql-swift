@@ -97,6 +97,13 @@ var package = Package(
             linkerSettings: linkerSettings
         ),
         .executableTarget(
+            name: "RemoteSync",
+            dependencies: ["Libsql"],
+            path: "Examples/RemoteSync",
+            exclude: ["README.md"],
+            linkerSettings: linkerSettings
+        ),        
+        .executableTarget(
             name: "Sync",
             dependencies: ["Libsql"],
             path: "Examples/Sync",
