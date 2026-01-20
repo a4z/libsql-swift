@@ -18,6 +18,9 @@ jobs:
           ref: ${{ env.BUILD_BRANCH }}
           submodules: recursive
 
+      - name: Add Rust targets for iOS
+        run: rustup target add aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim
+
       - name: Build XCFramework
         run: ./Turso/scripts/build-xcframework.sh
 
