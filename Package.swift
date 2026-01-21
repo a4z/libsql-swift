@@ -16,24 +16,41 @@ let libsqlDependencies: [Target.Dependency] = ["CLibsql"]
     let linkerSettings: [LinkerSetting] = []
 #endif
 
-#if os(Linux)
-    let binaryDependencyPath: String = {
-        #if arch(x86_64)
-            return "Turso/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle.zip"
-        #elseif arch(arm64)
-            return "Turso/CLibsqlLinux-aarch64-unknown-linux-gnu.artifactbundle.zip"
-        #else
-            fatalError("Unsupported Linux architecture.")
-        #endif
-    }()
-#else
-    let binaryDependencyPath = "Turso/CLibsql/CLibsql.xcframework"
-#endif
+// Toggle for local development: set to true to use local builds instead of downloaded binaries
+let useLocalBinaries = false
 
-let clibsqlTarget: Target = .binaryTarget(
-    name: "CLibsql",
-    path: binaryDependencyPath
-)
+let clibsqlTarget: Target = {
+    if useLocalBinaries {
+        // Local builds for development
+        #if os(Linux)
+            #if arch(x86_64)
+                let path = "Turso/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle"
+            #elseif arch(arm64)
+                let path = "Turso/CLibsqlLinux-aarch64-unknown-linux-gnu.artifactbundle"
+            #else
+                fatalError("Unsupported Linux architecture.")
+            #endif
+        #else
+            let path = "Turso/CLibsql/CLibsql.xcframework"
+        #endif
+        return .binaryTarget(name: "CLibsql", path: path)
+    } else {
+        // Downloaded binaries from GitHub releases
+        #if os(Linux)
+            return .binaryTarget(
+                name: "CLibsql",
+                url: "https://github.com/a4z/libsql-swift/releases/download/lsqlc-0.0.1/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle.zip",
+                checksum: "cc8d804e9649a42a7c141a6060561f57b81e26d9d0837a4be99337d4aa54bf37"
+            )
+        #else
+            return .binaryTarget(
+                name: "CLibsql",
+                url: "https://github.com/a4z/libsql-swift/releases/download/lsqlc-0.0.1/CLibsql.xcframework.zip",
+                checksum: "37de28c475ed5de5cbb9eebe493ad5b16b8dec8e70f415af0eb4ef6ec9588803"
+            )
+        #endif
+    }
+}()
 
 var package = Package(
     name: "Libsql",

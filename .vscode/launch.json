@@ -179,6 +179,26 @@
             "target": "Local",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release Local"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Debug RemoteSync",
+            "target": "RemoteSync",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug RemoteSync"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:libsql-swift}",
+            "name": "Release RemoteSync",
+            "target": "RemoteSync",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release RemoteSync"
         }
     ]
 }

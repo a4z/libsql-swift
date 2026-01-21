@@ -11,3 +11,5 @@ test.db*
 
 Turso/CLibsqlLinux*.artifactbundle/
 Turso/CLibsqlLinux*.artifactbundle.zip
+.env
+.env.*
