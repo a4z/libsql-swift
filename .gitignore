@@ -8,3 +8,8 @@ DerivedData/
 .netrc
 test.db*
 .sourcekit-lsp/
+
+Turso/CLibsqlLinux*.artifactbundle/
+Turso/CLibsqlLinux*.artifactbundle.zip
+.env
+.env.*

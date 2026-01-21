@@ -1,0 +1,11 @@
+# markdownlint configuration
+# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# MD013: Line length - disable to allow long lines
+MD013: false
+
+# MD036: Emphasis used instead of header - disable to allow bold/italic text that isn't a header
+MD036: false
+
+# MD041: First line in file should be a top level header - disable to allow files without h1 as first line  
+MD041: false

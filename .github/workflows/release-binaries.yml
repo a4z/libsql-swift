@@ -1,0 +1,85 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'lsqlc-*'
+
+env:
+  BUILD_BRANCH: feature/binary-linux
+
+jobs:
+  build-xcframework:
+    name: Build XCFramework (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.BUILD_BRANCH }}
+          submodules: recursive
+
+      - name: Add Rust targets for iOS
+        run: rustup target add aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim
+
+      - name: Build XCFramework
+        run: ./Turso/scripts/build-xcframework.sh
+
+      - name: Zip XCFramework
+        run: |
+          cd Turso/CLibsql
+          zip -r CLibsql.xcframework.zip CLibsql.xcframework
+
+      - name: Upload XCFramework artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: xcframework
+          path: Turso/CLibsql/CLibsql.xcframework.zip
+
+  build-linux-x86_64:
+    name: Build Linux x86_64 artifactbundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.BUILD_BRANCH }}
+          submodules: recursive
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#lsqlc-}" >> $GITHUB_OUTPUT
+
+      - name: Build artifactbundle
+        run: |
+          ./Turso/scripts/build-linux-artifactbundle.sh \
+            "${{ steps.version.outputs.VERSION }}" \
+            "" "" \
+            x86_64-unknown-linux-gnu \
+            CLibsqlLinux-x86_64-unknown-linux-gnu
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: linux-x86_64
+          path: Turso/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle.zip
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-xcframework, build-linux-x86_64]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/xcframework/CLibsql.xcframework.zip
+            artifacts/linux-x86_64/CLibsqlLinux-x86_64-unknown-linux-gnu.artifactbundle.zip
